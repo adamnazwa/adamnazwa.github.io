@@ -7,9 +7,9 @@
     --primary-dark: #500090; /* Ungu lebih gelap */
     --primary-light: #8A2BE2; /* Ungu lebih terang (Amethyst) */
 
-    --secondary-color: #009fe8; /* Hijau Khas */
-    --secondary-dark: #fff; /* Hijau lebih gelap */
-    --secondary-light: #009fe8; /* Hijau lebih terang */
+    --secondary-color: #009fe8; /* Biru Khas (menggantikan hijau) */
+    --secondary-dark: #007bff; /* Biru lebih gelap (untuk hover teks) */
+    --secondary-light: #4cbae7; /* Biru lebih terang (untuk background tag normal) */
 
     --accent-color: #FFD700; /* Kuning Emas untuk highlight */
     --accent-dark: #DAA520; /* Kuning Emas lebih gelap */
@@ -40,7 +40,7 @@ body {
     color: var(--text-dark);
     background-color: #f8faff; /* Latar belakang lebih lembut */
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Mencegah scroll horizontal yang tidak diinginkan */
 }
 
 /* Utilitas */
@@ -119,13 +119,13 @@ body {
 
 /* Hamburger menu (mobile only) */
 .hamburger {
-    display: none;
+    display: none; /* Defaultnya sembunyikan, akan ditampilkan di media query */
     flex-direction: column;
     justify-content: space-around;
     width: 30px;
     height: 25px;
     cursor: pointer;
-    z-index: 1001;
+    z-index: 1001; /* Pastikan di atas menu nav-links */
 }
 
 .hamburger .bar {
@@ -247,7 +247,7 @@ section h2:hover::after {
 /* Hero Section */
 .hero-section {
     background: linear-gradient(135deg, #e6f7ff 0%, #e0f2f7 100%);
-    min-height: calc(100vh - 86px);
+    min-height: calc(100vh - 86px); /* Mengkompensasi tinggi navbar */
     display: flex;
     align-items: center;
     text-align: left;
@@ -334,7 +334,6 @@ section h2:hover::after {
     max-width: 35%; /* Periksa ukuran ini */
     height: auto;
     border-radius: 15px;
-
     transition: transform 0.5s ease; /* Transisi saat hover */
 }
 
@@ -366,7 +365,6 @@ section h2:hover::after {
     max-width: 70%;
     height: auto;
     border-radius: 15px;
-
     transition: transform 0.5s ease; /* Transisi saat hover */
 }
 
@@ -493,10 +491,6 @@ section h2:hover::after {
 }
 
 .project-card .technologies span {
-    /* Hapus background-color dan color default, kita akan menggunakan border */
-    /* background-color: var(--secondary-light); */
-    /* color: var(--secondary-dark); */
-
     font-size: 14px;
     padding: 6px 12px;
     border-radius: 20px;
@@ -534,7 +528,6 @@ section h2:hover::after {
 
 /* Contact Section */
 .contact-section {
-    /* Menggunakan gradien yang lebih dinamis */
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: var(--text-light);
     padding: 100px 0;
@@ -568,9 +561,9 @@ section h2:hover::after {
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.8) opacity(0.8); }
-    50% { transform: scale(1.1) opacity(1); }
-    100% { transform: scale(0.8) opacity(0.8); }
+    0% { transform: scale(0.8); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.8; }
 }
 
 
@@ -793,7 +786,6 @@ footer .container {
     min-width: 100%;
     height: 100%;
     object-fit: contain; /* Menggunakan contain untuk gambar potret */
-    /* background-color: var(--bg-dark); Hapus ini, karena sudah di parent .modal-carousel */
     display: block;
     border-radius: 10px;
 }
@@ -903,153 +895,161 @@ footer .container {
 /* Responsive Design */
 @media (max-width: 992px) {
     .navbar .nav-links {
-        left: -100%;
-        width: 70%;
-        box-shadow: 2px 0 10px var(--shadow-heavy);
-    }
-    .navbar .nav-links.active {
-        left: 0;
-    }
-    .navbar .nav-links li {
-        margin: 20px 0;
-    }
-    .hamburger {
+        /* Tambahkan properti ini untuk membuat menu overlay */
+        position: fixed; /* Penting untuk overlay */
+        top: 0; /* Mulai dari atas */
+        right: 0; /* Geser dari kanan ke kiri */
+        height: 100vh; /* Tinggi penuh viewport */
+        background-color: var(--bg-light); /* Latar belakang menu */
         display: flex;
+        flex-direction: column; /* Item menu vertikal */
+        justify-content: center; /* Pusatkan item secara vertikal */
+        align-items: center; /* Pusatkan item secara horizontal */
+        padding: 0; /* Hapus padding default */
+        z-index: 999; /* Di bawah hamburger, di atas konten */
+        transform: translateX(100%); /* Sembunyikan di luar layar */
+        transition: transform var(--transition-speed) ease; /* Animasi geser */
+        
+        width: 70%; 
+        box-shadow: 2px 0 10px var(--shadow-heavy);
+        left: unset; /* Hapus left: -100% karena kita pakai right dan transformX */
     }
+
+    .navbar .nav-links.active {
+        transform: translateX(0); /* Munculkan menu */
+        left: unset; /* Hapus left: 0 yang mungkin menimpa transform */
+    }
+
+    .navbar .nav-links li {
+        margin: 20px 0; /* Jarak vertikal antar item menu */
+    }
+
+    .navbar .nav-links li a {
+        font-size: 24px; /* Ukuran font lebih besar untuk mobile */
+    }
+
+    .hamburger {
+        display: flex; /* Tampilkan hamburger di mobile */
+    }
+
+    /* Atur body overflow saat menu aktif */
+    body.no-scroll {
+        overflow: hidden;
+    }
+
+    /* Hero & About Section untuk mobile */
     .hero-section .container,
     .about-section .container {
-        flex-direction: column-reverse;
+        flex-direction: column; /* Gambar di bawah teks, atau teks di atas gambar */
         text-align: center;
+        gap: 60px; /* Tambah jarak antar elemen */
     }
-    .about-section .container {
-        flex-direction: column;
+
+    .hero-content,
+    .about-content {
+        max-width: 100%; /* Gunakan lebar penuh */
+        min-width: unset; /* Hapus min-width */
     }
-    .hero-content, .about-content {
+
+    .hero-image,
+    .about-image {
+        min-width: unset; /* Hapus min-width */
         max-width: 100%;
-        min-width: unset;
-        text-align: center;
     }
+    
+    .hero-image img,
+    .about-image img {
+        max-width: 70%; /* Sesuaikan lagi ukuran gambar untuk mobile */
+    }
+
     .hero-content h1 {
-        font-size: 48px;
+        font-size: 50px; /* Ukuran font hero lebih kecil di mobile */
     }
+
     .hero-content .role {
         font-size: 22px;
-        margin-bottom: 30px;
     }
-    .hero-content .role::after,
-    .about-content h2::after {
-        margin: 10px auto 0;
-    }
-    .about-content h2 {
-        text-align: center;
-    }
-    section h2 {
-        font-size: 38px;
-    }
-    .modal-content {
-        width: 95%;
-        padding: 20px;
-    }
-    .modal-carousel {
-        height: 350px;
-    }
-    .modal-body h3 {
-        font-size: 30px;
-        margin-bottom: 20px;
-    }
-    .modal-details p {
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
-    .modal-technologies span {
-        font-size: 14px;
-        padding: 7px 12px;
-    }
-    .modal-links {
-        flex-direction: column;
-        align-items: center;
-    }
-}
 
-@media (max-width: 768px) {
-    section {
-        padding: 80px 0;
-    }
     section h2 {
-        font-size: 34px;
+        font-size: 38px; /* Ukuran judul section lebih kecil */
         margin-bottom: 40px;
     }
-    .hero-content h1 {
-        font-size: 40px;
+
+    section h2::after {
+        margin: 10px auto 0; /* Tengah untuk mobile */
     }
-    .hero-content .role {
-        font-size: 18px;
+
+    .about-content h2 {
+        text-align: center; /* Tengah judul About untuk mobile */
     }
-    .project-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
+    .about-content h2::after {
+        margin: 10px auto 0; /* Tengah untuk judul About */
     }
-    .contact-info {
-        flex-direction: column;
-        gap: 20px;
+
+    .projects-section .project-grid {
+        grid-template-columns: 1fr; /* Satu kolom untuk project card di mobile */
     }
+
+    /* Modal Styling for smaller screens */
+    .modal-content {
+        width: 95%; /* Agak lebih lebar di mobile */
+        padding: 20px;
+        max-height: 90vh; /* Batasi tinggi modal */
+        overflow-y: auto; /* Aktifkan scroll di dalam modal jika kontennya panjang */
+    }
+
     .modal-carousel {
-        height: 280px;
+        height: 300px; /* Sesuaikan tinggi carousel */
     }
+
     .modal-body h3 {
-        font-size: 26px;
+        font-size: 30px; /* Ukuran judul modal lebih kecil */
+        margin-bottom: 15px;
     }
-    .carousel-btn {
-        padding: 10px 8px;
-        font-size: 20px;
+
+    .modal-details p {
+        font-size: 16px;
     }
-    .dot {
-        width: 10px;
-        height: 10px;
+
+    .modal-links .btn {
+        width: 100%; /* Tombol link modal menjadi penuh lebar */
+        justify-content: center;
+    }
+
+    footer .container {
+        flex-direction: column; /* Footer item menjadi vertikal */
+        gap: 15px;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .navbar .logo {
         font-size: 24px;
     }
+
+    .hero-content h1 {
+        font-size: 40px;
+    }
+
+    .hero-content .role {
+        font-size: 20px;
+    }
+
     .btn {
         padding: 12px 25px;
-        font-size: 15px;
+        font-size: 16px;
     }
-    .hero-content h1 {
+
+    section h2 {
         font-size: 32px;
     }
-    .hero-content .greeting {
-        font-size: 16px;
+
+    .contact-info {
+        flex-direction: column;
     }
-    .hero-content .role {
-        font-size: 16px;
-        margin-bottom: 25px;
-    }
-    .modal-content {
-        padding: 15px;
-    }
-    .close-btn {
-        font-size: 30px;
-        top: 10px;
-        right: 15px;
-    }
-    .modal-carousel {
-        height: 200px;
-    }
-    .modal-body h3 {
-        font-size: 22px;
-    }
-    .modal-details p {
-        font-size: 15px;
-    }
-    .modal-technologies span {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-    .modal-links .btn {
-        padding: 10px 20px;
-        font-size: 14px;
+
+    .contact-item {
+        width: 100%;
+        justify-content: center;
     }
 }
