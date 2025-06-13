@@ -3,15 +3,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const sections = document.querySelectorAll('section');
     const navbar = document.querySelector('.navbar');
     const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-links');
+    const navMenu = document.querySelector('.nav-links'); // Ini adalah ul.nav-links
 
     // Smooth Scrolling & Active Nav Link
     function updateActiveNavLink() {
         let currentActive = '';
+        // Perbaiki ini: 'pageYOffset' sudah deprecated, gunakan 'window.scrollY'
+        const scrollY = window.scrollY || window.pageYOffset; // Kompatibilitas browser
+
         sections.forEach(section => {
             const sectionTop = section.offsetTop - navbar.offsetHeight - 50; // Offset for padding
             const sectionHeight = section.clientHeight;
-            if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+            if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) { // Gunakan scrollY
                 currentActive = section.getAttribute('id');
             }
         });
@@ -43,16 +46,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (hamburger.classList.contains('active')) {
                     hamburger.classList.remove('active');
                     navMenu.classList.remove('active');
+                    document.body.classList.remove('no-scroll'); // Pastikan ini ada
                 }
             }
         });
     });
 
     // Hamburger Menu Toggle
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-    });
+    if (hamburger && navMenu) { // Pastikan elemen ditemukan sebelum menambahkan event listener
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            document.body.classList.toggle('no-scroll'); // Tambahkan ini
+        });
+    }
+
 
     // Animate elements on scroll
     const animateOnScrollElements = document.querySelectorAll('.animate-slide-up, .animate-fade-in');
@@ -75,6 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
 
     animateOnScrollElements.forEach(el => {
+        // Set initial styles for animation
+        if (el.classList.contains('animate-slide-up')) {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+        } else if (el.classList.contains('animate-fade-in')) {
+            el.style.opacity = '0';
+        }
         observer.observe(el);
     });
 
@@ -84,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const projectModal = document.getElementById('projectModal');
     const closeBtn = document.querySelector('.close-btn');
-    // Mengambil semua tombol "View Details" pada kartu proyek
     const openModalBtns = document.querySelectorAll('.clickable-project-card'); 
     const modalProjectName = document.getElementById('modalProjectName');
     const modalProjectDescription = document.getElementById('modalProjectDescription');
@@ -111,8 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = projectCard.dataset.projectName;
         const description = projectCard.dataset.projectDescription;
         const technologies = projectCard.dataset.projectTech;
-        const liveLink = projectCard.dataset.liveLink; // Mengambil data-project-live-link
-        const githubLink = projectCard.dataset.githubLink; // Mengambil data-project-github-link
+        const liveLink = projectCard.dataset.liveLink;
+        const githubLink = projectCard.dataset.githubLink;
         const imagesJson = projectCard.dataset.projectImages;
 
         // Populate modal content
@@ -130,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Set links and hide if not available
-        // Pastikan links adalah string non-kosong dan bukan hanya '#'
         if (liveLink && liveLink.trim() !== '' && liveLink.trim() !== '#') {
             modalLiveLink.href = liveLink;
             modalLiveLink.style.display = 'inline-flex'; // Show button
@@ -144,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             modalGithubLink.style.display = 'none'; // Hide button
         }
-
 
         // Handle image carousel
         try {
@@ -205,12 +217,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 carouselDotsContainer.appendChild(dot);
             });
             // Show carousel buttons if multiple images
-            prevBtn.style.display = 'block';
-            nextBtn.style.display = 'block';
+            if (prevBtn && nextBtn) { // Pastikan tombol ada sebelum mengubah display
+                prevBtn.style.display = 'block';
+                nextBtn.style.display = 'block';
+            }
         } else {
             // Hide carousel buttons if only one image
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
+            if (prevBtn && nextBtn) { // Pastikan tombol ada sebelum mengubah display
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
         }
     }
 
@@ -225,15 +241,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Carousel Navigation
-    prevBtn.addEventListener('click', () => {
-        currentSlideIndex = (currentSlideIndex === 0) ? projectImages.length - 1 : currentSlideIndex - 1;
-        updateCarousel();
-    });
+    if (prevBtn) { // Pastikan tombol ada
+        prevBtn.addEventListener('click', () => {
+            currentSlideIndex = (currentSlideIndex === 0) ? projectImages.length - 1 : currentSlideIndex - 1;
+            updateCarousel();
+        });
+    }
+    if (nextBtn) { // Pastikan tombol ada
+        nextBtn.addEventListener('click', () => {
+            currentSlideIndex = (currentSlideIndex === projectImages.length - 1) ? 0 : currentSlideIndex + 1;
+            updateCarousel();
+        });
+    }
 
-    nextBtn.addEventListener('click', () => {
-        currentSlideIndex = (currentSlideIndex === projectImages.length - 1) ? 0 : currentSlideIndex + 1;
-        updateCarousel();
-    });
 
     // Event listeners for opening modal
     openModalBtns.forEach(button => {
@@ -245,18 +265,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Event listener for closing modal
-    closeBtn.addEventListener('click', closeModal);
+    if (closeBtn) { // Pastikan tombol tutup ada
+        closeBtn.addEventListener('click', closeModal);
+    }
 
     // Close modal if click outside modal-content
-    projectModal.addEventListener('click', function(e) {
-        if (e.target === projectModal) {
-            closeModal();
-        }
-    });
+    if (projectModal) { // Pastikan modal ada
+        projectModal.addEventListener('click', function(e) {
+            if (e.target === projectModal) {
+                closeModal();
+            }
+        });
+    }
 
     // Close modal with Esc key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && projectModal.classList.contains('active')) {
+        if (e.key === 'Escape' && projectModal && projectModal.classList.contains('active')) {
             closeModal();
         }
     });
